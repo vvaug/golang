@@ -27,7 +27,7 @@ func main() {
 		case 1:
 			trace(DEFAULT_TRACE_ATTEMPTS)
 		case 2:
-			fmt.Println("Not Implemented")
+			logs()
 		case 0:
 			fmt.Println("Exiting")
 			os.Exit(0)
@@ -147,9 +147,9 @@ func logger(applicationUrl string, wasOnline bool) {
 	var content string
 
 	if wasOnline {
-		content = applicationUrl + " was online\n"
+		content = time.Now().Format("02/01/2006 15:04:05") + " => " + applicationUrl + " was online\n"
 	} else {
-		content = applicationUrl + " was offline\n"
+		content = time.Now().Format("02/01/2006 15:04:05") + " => " + applicationUrl + " was offline\n"
 	}
 
 	if err != nil {
@@ -157,4 +157,30 @@ func logger(applicationUrl string, wasOnline bool) {
 	}
 
 	file.WriteString(content)
+}
+
+func logs() {
+
+	file, err := os.Open("applications-tracing.log")
+
+	if err != nil {
+		fmt.Println("An error occurred while trying to open log file:", err)
+	}
+
+	scanner := bufio.NewReader(file)
+
+	for {
+
+		line, err := scanner.ReadString('\n')
+
+		if err == io.EOF {
+			break
+		}
+
+		line = strings.TrimSpace(line)
+
+		fmt.Println(line)
+	}
+
+	file.Close()
 }
