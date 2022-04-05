@@ -53,17 +53,17 @@ func createProduct(context *gin.Context) {
 	if err != nil {
 		fmt.Println("An error occurred while trying to create a new Product")
 	}
-	if !isValidProduct(&product) {
-		context.IndentedJSON(http.StatusConflict, HttpError{409, "Product already exists with the entered id"})
+	if !isValidProduct(&product, context) {
 		return
 	}
 	products = append(products, product)
 	context.IndentedJSON(http.StatusCreated, products)
 }
 
-func isValidProduct(product *Product) bool {
+func isValidProduct(product *Product, context *gin.Context) bool {
 	for _, value := range products {
 		if value.Id == product.Id {
+			context.IndentedJSON(http.StatusConflict, HttpError{409, "Product already exists with the entered id"})
 			return false
 		}
 	}
