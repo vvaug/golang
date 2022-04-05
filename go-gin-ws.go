@@ -15,6 +15,11 @@ type Product struct {
 	Price    float64 `json:"price"`
 }
 
+type HttpError struct {
+	Code    int64  `json:"code"`
+	Message string `json:"message"`
+}
+
 var products = []Product{
 	{1, "Notebook", 15, 2500.00},
 	{2, "TV", 22, 2200.00},
@@ -48,6 +53,19 @@ func createProduct(context *gin.Context) {
 	if err != nil {
 		fmt.Println("An error occurred while trying to create a new Product")
 	}
+	if !isValidProduct(&product) {
+		context.IndentedJSON(http.StatusConflict, HttpError{409, "Product already exists with the entered id"})
+		return
+	}
 	products = append(products, product)
 	context.IndentedJSON(http.StatusCreated, products)
+}
+
+func isValidProduct(product *Product) bool {
+	for _, value := range products {
+		if value.Id == product.Id {
+			return false
+		}
+	}
+	return true
 }
